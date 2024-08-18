@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+  "name": "YouTube Whitelist Filter",
+  "version": "1.0",
+  "description": "Show only YouTube videos that match specified keywords",
+  "permissions": [
+    "storage",
+    "https://www.youtube.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "browser_action": {
+    "default_popup": "popup.html"
+  }
+}

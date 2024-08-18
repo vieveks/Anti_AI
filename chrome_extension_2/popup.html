@@ -1,0 +1,23 @@
+// popup.html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>YouTube Whitelist Filter</title>
+  <style>
+    body { width: 300px; padding: 10px; }
+    input { width: 100%; margin-bottom: 10px; }
+    button { width: 100%; margin-bottom: 10px; }
+    ul { list-style-type: none; padding: 0; }
+    li { margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+  <h2>YouTube Whitelist Keywords</h2>
+  <input type="text" id="keyword" placeholder="Enter a keyword to whitelist">
+  <button id="add">Add Keyword</button>
+  <button id="reset">Reset to Default Keywords</button>
+  <h3>Current Keywords:</h3>
+  <ul id="keywordList"></ul>
+  <script src="popup.js"></script>
+</body>
+</html>
