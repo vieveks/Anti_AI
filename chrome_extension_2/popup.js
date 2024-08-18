@@ -1,10 +1,10 @@
-const defaultKeywords = ['Tutorial', 'How To', 'Learn']; // You can modify these default keywords
-let keywords = [];
+const defaultKeywords = ['Tutorial', 'How To', 'Learn'];
+let keywords = new Set();
 
 // Load existing keywords or use defaults
 function loadKeywords() {
   chrome.storage.sync.get(['whitelistKeywords'], function(result) {
-    keywords = result.whitelistKeywords || defaultKeywords;
+    keywords = new Set(result.whitelistKeywords || defaultKeywords);
     updateKeywordList();
   });
 }
@@ -14,20 +14,15 @@ loadKeywords();
 
 document.getElementById('add').addEventListener('click', function() {
   const keyword = document.getElementById('keyword').value.trim();
-  if (keyword && !keywords.includes(keyword)) {
-    keywords.push(keyword); // Store the keyword as-is, maintaining case
+  if (keyword && !keywords.has(keyword)) {
+    keywords.add(keyword);
     saveKeywords();
     document.getElementById('keyword').value = '';
   }
 });
 
-document.getElementById('reset').addEventListener('click', function() {
-  keywords = [...defaultKeywords];
-  saveKeywords();
-});
-
 function saveKeywords() {
-  chrome.storage.sync.set({whitelistKeywords: keywords}, function() {
+  chrome.storage.sync.set({whitelistKeywords: Array.from(keywords)}, function() {
     updateKeywordList();
     notifyContentScript();
   });

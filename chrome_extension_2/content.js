@@ -68,3 +68,70 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 
 // Periodically re-filter videos to catch any that might have been missed
 setInterval(filterVideos, 5000);
+
+// let whitelistKeywords = new Set();
+// let keywordRegex = null;
+
+// // Fetch whitelist keywords from storage
+// chrome.storage.sync.get(['whitelistKeywords'], function(result) {
+//   whitelistKeywords = new Set(result.whitelistKeywords || []);
+//   updateRegex();
+//   filterVideos();
+// });
+
+// function updateRegex() {
+//   const escapedKeywords = Array.from(whitelistKeywords).map(keyword => 
+//     keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+//   );
+//   keywordRegex = new RegExp(escapedKeywords.join('|'), 'i');
+// }
+
+// function findVideoElements() {
+//   return document.querySelectorAll('ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer');
+// }
+
+// function filterVideos() {
+//   console.log('Filtering videos with whitelist keywords:', Array.from(whitelistKeywords));
+//   const videoElements = findVideoElements();
+  
+//   for (let video of videoElements) {
+//     const titleElement = video.querySelector('#video-title, #title');
+//     if (titleElement) {
+//       const title = titleElement.innerText;
+//       const shouldShow = keywordRegex.test(title);
+      
+//       video.style.display = shouldShow ? '' : 'none';
+//     }
+//   }
+  
+//   console.log(`Processed ${videoElements.length} videos`);
+// }
+
+// // Debounce function
+// function debounce(func, wait) {
+//   let timeout;
+//   return function executedFunction(...args) {
+//     const later = () => {
+//       clearTimeout(timeout);
+//       func(...args);
+//     };
+//     clearTimeout(timeout);
+//     timeout = setTimeout(later, wait);
+//   };
+// }
+
+// // Debounced filter function
+// const debouncedFilter = debounce(filterVideos, 250);
+
+// // Set up a MutationObserver to handle dynamically loaded content
+// const observer = new MutationObserver(debouncedFilter);
+// observer.observe(document.body, { childList: true, subtree: true });
+
+// // Listen for updates to whitelist keywords
+// chrome.storage.onChanged.addListener(function(changes, namespace) {
+//   if (changes.whitelistKeywords) {
+//     whitelistKeywords = new Set(changes.whitelistKeywords.newValue);
+//     updateRegex();
+//     debouncedFilter();
+//   }
+// });
