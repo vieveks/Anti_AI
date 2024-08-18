@@ -1,9 +1,8 @@
-// content.js
-let keywords = [];
+let whitelistKeywords = [];
 
-// Fetch keywords from storage
-chrome.storage.sync.get(['keywords'], function(result) {
-  keywords = result.keywords || [];
+// Fetch whitelist keywords from storage
+chrome.storage.sync.get(['whitelistKeywords'], function(result) {
+  whitelistKeywords = result.whitelistKeywords || [];
   filterVideos();
 });
 
@@ -20,26 +19,39 @@ function findVideoElements() {
 }
 
 function filterVideos() {
-  console.log('Filtering videos with keywords:', keywords);
+  console.log('Filtering videos with whitelist keywords:', whitelistKeywords);
   const videoElements = findVideoElements();
   
   videoElements.forEach(video => {
     const titleElement = video.querySelector('#video-title, #title');
     if (titleElement) {
       const title = titleElement.innerText.toLowerCase();
-      const shouldShow = keywords.length === 0 || keywords.some(keyword => title.includes(keyword.toLowerCase()));
+      const shouldShow = whitelistKeywords.some(keyword => 
+        title.includes(keyword.toLowerCase())
+      );
       
       if (shouldShow) {
-        console.log('Showing video:', title);
-        video.style.display = ''; // Reset to default display value
+        video.style.display = ''; // Show matching videos
       } else {
-        video.style.display = 'none';
+        video.style.display = 'none'; // Hide non-matching videos
       }
     }
   });
   
   console.log(`Processed ${videoElements.length} videos`);
 }
+
+// Debounce function
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+// Debounced filter function
+const debouncedFilter = debounce(filterVideos, 250);
 
 // Set up a MutationObserver to handle dynamically loaded content
 const observer = new MutationObserver((mutations) => {
@@ -52,27 +64,23 @@ const observer = new MutationObserver((mutations) => {
   }
   if (shouldFilter) {
     console.log('New content detected, re-filtering videos');
-    filterVideos();
+    debouncedFilter();
   }
 });
 
 observer.observe(document.body, { childList: true, subtree: true });
 
-// Listen for updates to keywords
+// Listen for updates to whitelist keywords
 chrome.storage.onChanged.addListener(function(changes, namespace) {
-  if (changes.keywords) {
-    console.log('Keywords updated');
-    keywords = changes.keywords.newValue;
-    filterVideos();
+  if (changes.whitelistKeywords) {
+    console.log('Whitelist keywords updated');
+    whitelistKeywords = changes.whitelistKeywords.newValue;
+    debouncedFilter();
   }
 });
+
+// Initial filter
+filterVideos();
 
 // Periodically re-filter videos to catch any that might have been missed
-setInterval(filterVideos, 5000);
-
-// Listen for messages from popup
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.action === "refilter") {
-    filterVideos();
-  }
-});
+setInterval(debouncedFilter, 5000);
